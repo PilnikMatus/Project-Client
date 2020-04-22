@@ -13,34 +13,9 @@ class Program
  {
         static void Main(string[] args)
         {
-            //GET funguje
-            
-            //POST funguje
+            HttpRequests httpRequests = new HttpRequests();
 
-            //PUT
-             using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("http://localhost:49497/api/");
-
-                var student = new Client() { name = "Steve", mac_address = "ergreg", ip_address = "ergerg", active = 0 };
-
-                var postTask = client.PutAsJsonAsync<Client>("client/3", student);
-                postTask.Wait();
-
-                var result = postTask.Result;
-                if (result.IsSuccessStatusCode)
-                {
-
-                    var readTask = result.Content.ReadAsAsync<Client>();
-                    readTask.Wait();
-
-                }
-                else
-                {
-                    Console.WriteLine(result.StatusCode);
-                }
-            }
-            //DELETE funguje
+            httpRequests.Post();
 
             Console.ReadLine();
         }
