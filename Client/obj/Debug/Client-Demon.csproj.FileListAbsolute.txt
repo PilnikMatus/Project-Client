@@ -1,0 +1,4 @@
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\Client-Demon.csprojAssemblyReference.cache
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\Client-Demon.csproj.CoreCompileInputs.cache
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\Client.exe
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\Client.pdb
