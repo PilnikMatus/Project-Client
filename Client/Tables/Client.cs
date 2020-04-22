@@ -12,6 +12,6 @@ namespace ClientDemon.Tables
         public string name { get; set; }
         public string mac_address { get; set; }
         public string ip_address { get; set; }
-        public int active { get; set; }
+        public bool active { get; set; }
     }
 }

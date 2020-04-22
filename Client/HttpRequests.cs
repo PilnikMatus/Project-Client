@@ -11,17 +11,16 @@ using System.Threading.Tasks;
 
 namespace ClientDemon
 {
-    public class HttpRequests
+    public static class HttpRequests
     {
-        public string URL { get; set; } = "http://localhost:49497/api/";
+        public static string URL { get; set; } = "http://localhost:49497/api/";
 
-        public void Get()
+        public static void Get()
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(this.URL);
+                client.BaseAddress = new Uri(URL);
 
-                //HTTP GET
                 var responseTask = client.GetAsync("client");
                 responseTask.Wait();
 
@@ -41,11 +40,34 @@ namespace ClientDemon
                 }
             }
         }
-        public void Post()
+        public static Client[] GetRows()
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(this.URL);
+                client.BaseAddress = new Uri(URL);
+
+                var responseTask = client.GetAsync("client");
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+
+                    var readTask = result.Content.ReadAsAsync<Client[]>();
+                    readTask.Wait();
+
+                    var students = readTask.Result;
+
+                    return students;
+                }
+                return null;
+            }
+        }
+        public static void Post()
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(URL);
                 
 
                 var student = new Client() { name = IPMethods.GetLocalPCName(), mac_address = IPMethods.GetLocalMac(), ip_address = IPMethods.GetLocalIPAddress() };
@@ -68,13 +90,13 @@ namespace ClientDemon
                 }
             }
         }
-        public void Put()
+        public static void Put()
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(this.URL);
+                client.BaseAddress = new Uri(URL);
 
-                var student = new Client() { name = "Steve", mac_address = "ergreg", ip_address = "ergerg", active = 0 };
+                var student = new Client() { name = "Steve", mac_address = "ergreg", ip_address = "ergerg", active = false };
 
                 var postTask = client.PutAsJsonAsync<Client>("client/3", student);
                 postTask.Wait();
@@ -94,11 +116,11 @@ namespace ClientDemon
                 }
             }
         }
-        public void Delete()
+        public static void Delete()
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(this.URL);
+                client.BaseAddress = new Uri(URL);
 
                 int id_client = 1;
                 var responseTask = client.DeleteAsync($"client/{id_client}");
