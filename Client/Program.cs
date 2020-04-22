@@ -7,30 +7,30 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using ClientDemon.Tables;
 using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace ClientDemon
 {
-    class Program
+    public class Program
     {
+        public static Application app = new Application();
         static void Main(string[] args)
         {
             Timer timer = new Timer(Tick, null, 0, 5000);
 
             while (true)
             {
+                ConsoleKey info = Console.ReadKey().Key;
 
-                //check jestli už je tento v PC v databazi, pokud ano, dále; pokud ne, přidá se.
-                //check jestli je aktivní,
-                //pokud ano, zjistí, data o zálohování
+                if (info == ConsoleKey.Escape)
+                    Environment.Exit(0);
             }
         }
         public static void Tick(object O)
         {
-            Application app = new Application();
+            Console.WriteLine("---" + DateTime.Now + "---");
             app.Run();
-            Console.WriteLine("tick");
+            Console.WriteLine();
         }
-
     }
-
 }
