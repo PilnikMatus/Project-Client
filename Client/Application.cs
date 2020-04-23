@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ClientDemon
@@ -10,6 +11,7 @@ namespace ClientDemon
     public class Application
     {
         public int id_client { get; set; }
+        public string name_client { get; set; }
         Client client = new Client();
 
         public void Run()
@@ -18,13 +20,14 @@ namespace ClientDemon
             {
                 Console.WriteLine("PC bude přidán do databáze");
                 AddThisPC();
+                Thread.Sleep(5000); //počkat na uložení - dělalo problémy
             }
             else
                 Console.WriteLine("PC je již v databázi");
 
             if (IsActive())
             {
-                Console.WriteLine("PC: AKTIVNÍ");
+                Console.WriteLine($"PC({name_client}): AKTIVNÍ");
                 GetBackups();
 
                 Console.WriteLine("Backupy nastavené na tento PC:");
@@ -34,7 +37,7 @@ namespace ClientDemon
                 }
             }
             else
-                Console.WriteLine("PC: NEAKTIVNÍ");
+                Console.WriteLine($"PC({name_client}): NEAKTIVNÍ");
             
         }
 
@@ -61,6 +64,7 @@ namespace ClientDemon
                 if (IPMethods.GetLocalIPAddress() == item.ip_address
                    && IPMethods.GetLocalMac() == item.mac_address)
                 {
+                    this.name_client = item.name;
                     this.id_client = Convert.ToInt32(item.id);
                     if (item.active)
                         return true;

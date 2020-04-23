@@ -13,7 +13,7 @@ namespace ClientDemon
 {
     public static class HttpRequests
     {
-        public static string URL { get; set; } = "http://localhost:49497/api/";
+        public static string URL { get; set; } = "http://192.168.1.198/api/";
 
         public static Client[] GetClientRows()
         {
