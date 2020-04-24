@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using ClientDemon.Tables;
 using System.Threading;
 using System.Runtime.CompilerServices;
+using Microsoft.Win32;
 
 namespace ClientDemon
 {

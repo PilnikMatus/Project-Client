@@ -9,7 +9,7 @@ namespace ClientDemon.Tables
     public class Job
     {
         public int id { get; set; }
-        public int id_client { get; set; }
+        public string id_client { get; set; }
         public int id_backup { get; set; }
     }
 }

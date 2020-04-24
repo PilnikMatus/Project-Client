@@ -1,4 +1,5 @@
 ﻿using ClientDemon.Tables;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,24 +11,22 @@ namespace ClientDemon
 {
     public class Application
     {
-        public int id_client { get; set; }
-        public string name_client { get; set; }
-        Client client = new Client();
+        public Client client = new Client();
 
         public void Run()
-        {
+        {            
             if(!IsInDBS())
             {
                 Console.WriteLine("PC bude přidán do databáze");
                 AddThisPC();
-                Thread.Sleep(5000); //počkat na uložení - dělalo problémy
+                Thread.Sleep(10000); //počkat na uložení - dělalo problémy
             }
             else
-                Console.WriteLine("PC je již v databázi");
+                Console.WriteLine("PC je v databázi");
 
             if (IsActive())
             {
-                Console.WriteLine($"PC({name_client}): AKTIVNÍ");
+                Console.WriteLine($"PC({this.client.name}): AKTIVNÍ");
                 GetBackups();
 
                 Console.WriteLine("Backupy nastavené na tento PC:");
@@ -37,20 +36,22 @@ namespace ClientDemon
                 }
             }
             else
-                Console.WriteLine($"PC({name_client}): NEAKTIVNÍ");
+                Console.WriteLine($"PC({this.client.name}): NEAKTIVNÍ");
             
         }
 
         public bool IsInDBS()
         {
-            Client[] clients = HttpRequests.GetClientRows();
-            foreach (var item in clients)
+            Client client = HttpRequests.GetClient();
+
+            if (client != null)
             {
-                if (IPMethods.GetLocalIPAddress() == item.ip_address
-                   && IPMethods.GetLocalMac() == item.mac_address)
-                    return true;
+                this.client = client;
+                return true;
             }
-            return false;
+            else
+                return false;
+            
         }
         public void AddThisPC()
         {
@@ -58,21 +59,10 @@ namespace ClientDemon
         }
         public bool IsActive()
         {
-            Client[] clients = HttpRequests.GetClientRows();
-            foreach (var item in clients)
-            {
-                if (IPMethods.GetLocalIPAddress() == item.ip_address
-                   && IPMethods.GetLocalMac() == item.mac_address)
-                {
-                    this.name_client = item.name;
-                    this.id_client = Convert.ToInt32(item.id);
-                    if (item.active)
-                        return true;
-                    else
-                        return false;
-                }
-            }
-            throw new Exception("Tento PC nebyl nalezen");
+            if (this.client.active)
+                return true;
+            else
+                return false;
         }
         public List<int> GetIdBackup()
         {
@@ -82,7 +72,7 @@ namespace ClientDemon
 
             foreach (var item in jobs)
             {
-                if (this.id_client == item.id_client)
+                if (this.client.id == item.id_client)
                 {
                     id_backup.Add(item.id_backup);
                 }

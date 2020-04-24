@@ -9,4 +9,3 @@ C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\ClientDemon.csproj
 C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\ClientDemon.csproj.CopyComplete
 C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\Client.exe
 C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\Client.pdb
-C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\ClientDemon.csprojAssemblyReference.cache
