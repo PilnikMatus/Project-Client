@@ -51,7 +51,7 @@ namespace ClientDemon
 
             string unique_pc_id = CreateClientId();
 
-            key.SetValue("unique_pc_id", unique_pc_id);
+            key.SetValue("pc_id", unique_pc_id);
             key.Close();
 
             return unique_pc_id;
@@ -78,8 +78,8 @@ namespace ClientDemon
 
             if (keyread != null)
             {
-                if(keyread.GetValue("unique_pc_id") != null)
-                unique_pc_id = keyread.GetValue("unique_pc_id").ToString();
+                if(keyread.GetValue("pc_id") != null)
+                unique_pc_id = keyread.GetValue("pc_id").ToString();
                 keyread.Close();
             }
             return unique_pc_id;

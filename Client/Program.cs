@@ -29,9 +29,12 @@ namespace ClientDemon
         }
         public static void Tick(object O)
         {
+            
             Console.WriteLine("---" + DateTime.Now + "---");
             app.Run();
             Console.WriteLine();
+
+
         }
     }
 }

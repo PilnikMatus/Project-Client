@@ -24,6 +24,7 @@ namespace ClientDemon
             else
                 Console.WriteLine("PC je v databázi");
 
+
             if (IsActive())
             {
                 Console.WriteLine($"PC({this.client.name}): AKTIVNÍ");
@@ -32,11 +33,14 @@ namespace ClientDemon
                 Console.WriteLine("Backupy nastavené na tento PC:");
                 foreach (Backup item in GetBackups())
                 {
-                    Console.WriteLine($"BACKUP -- Název: {item.name}, ID admina: {item.id_admin}, Backup typ: {item.backup_type}, Format typ: {item.format_type}, Poslední backup: {item.last_possible_backup_date}, Aktivní: {item.active}");
+                    if(item.active)
+                        Console.WriteLine($"BACKUP -- Název: {item.name}, ID admina: {item.id_admin}, Backup typ: {item.backup_type}, Format typ: {item.format_type}, Poslední backup: {item.last_possible_backup_date}, Aktivní: {item.active}");
                 }
             }
+
             else
                 Console.WriteLine($"PC({this.client.name}): NEAKTIVNÍ");
+
             
         }
 
