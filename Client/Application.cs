@@ -28,14 +28,9 @@ namespace ClientDemon
             if (IsActive())
             {
                 Console.WriteLine($"PC({this.client.name}): AKTIVNÍ");
-                GetBackups();
 
-                Console.WriteLine("Backupy nastavené na tento PC:");
-                foreach (Backup item in GetBackups())
-                {
-                    if(item.active)
-                        Console.WriteLine($"BACKUP -- Název: {item.name}, ID admina: {item.id_admin}, Backup typ: {item.backup_type}, Format typ: {item.format_type}, Poslední backup: {item.last_possible_backup_date}, Aktivní: {item.active}");
-                }
+                Console.WriteLine("Backupy nastavené na tento PC: nezobrazuje se");
+
             }
 
             else
@@ -59,7 +54,9 @@ namespace ClientDemon
         }
         public void AddThisPC()
         {
-            HttpRequests.PostClient();
+            string id_client = HttpRequests.PostClient().id;
+
+            RegistryUsing.CreateRegistryId(id_client);
         }
         public bool IsActive()
         {
@@ -67,43 +64,6 @@ namespace ClientDemon
                 return true;
             else
                 return false;
-        }
-        public List<int> GetIdBackup()
-        {
-            Job[] jobs = HttpRequests.GetJobRows();
-
-            List<int> id_backup = new List<int>();
-
-            foreach (var item in jobs)
-            {
-                if (this.client.id == item.id_client)
-                {
-                    id_backup.Add(item.id_backup);
-                }
-            }
-            return id_backup;
-            
-        }
-        public List<Backup> GetBackups()
-        {
-            List<int> id_backup = GetIdBackup(); //ID backupů
-
-            Backup[] backups = HttpRequests.GetBackupRows(); //všechny backupy z tabulky BACKUP
-
-            List<Backup> my_backups = new List<Backup>(); //BACKUPy souvisejici s tímto PC
-
-
-            foreach (var item in backups)
-            {
-                foreach (int id in id_backup)
-                {
-                    if (id == item.id)
-                    {
-                        my_backups.Add(item);
-                    }
-                }
-            }
-            return my_backups;
         }
     }
 }

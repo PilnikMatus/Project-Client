@@ -24,7 +24,16 @@ namespace ClientDemon
                 ConsoleKey info = Console.ReadKey().Key;
 
                 if (info == ConsoleKey.Escape)
-                    Environment.Exit(0);
+                {
+                    //Environment.Exit(0);
+                    
+                    RegistryUsing.CreateBackups(HttpRequests.PostGetBackups());
+                    RegistryUsing.CreateBackupTimes(HttpRequests.PostGetBackupTimes());
+                    RegistryUsing.CreateBackupTargets(HttpRequests.PostGetBackupTargets());
+                    RegistryUsing.CreateBackupSources(HttpRequests.PostGetBackupSources());
+                    //RegistryUsing.GetBackups();
+                }
+                
             }
         }
         public static void Tick(object O)

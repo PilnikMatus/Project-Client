@@ -52,12 +52,17 @@
     <Compile Include="Application.cs" />
     <Compile Include="BackupFunc.cs" />
     <Compile Include="HttpRequests.cs" />
-    <Compile Include="IPMethods.cs" />
+    <Compile Include="ComputerInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegistryUsing.cs" />
     <Compile Include="Tables\Backup.cs" />
+    <Compile Include="Tables\backup_source.cs" />
+    <Compile Include="Tables\backup_target.cs" />
+    <Compile Include="Tables\backup_time.cs" />
     <Compile Include="Tables\Client.cs" />
     <Compile Include="Tables\Job.cs" />
+    <Compile Include="Tables\Token.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

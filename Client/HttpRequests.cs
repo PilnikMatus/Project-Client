@@ -17,15 +17,16 @@ namespace ClientDemon
         public static string URL { get; set; } = "http://localhost:49497/api/";
         //public static string URL { get; set; } = "http://192.168.1.198/api/";
 
-        public static Client GetClient()
+        public static Client GetClient() //GET: kontrola jestli je tento client v DBS
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
                 Client thisClient = null;
 
-                string unique_pc_id = IPMethods.GetRegistryId();
-                var responseTask = client.GetAsync("client/" + unique_pc_id);
+                string id_client = RegistryUsing.GetRegistryId();
+
+                var responseTask = client.GetAsync("client/" + id_client);
                 responseTask.Wait();
 
                 var result = responseTask.Result;
@@ -41,15 +42,15 @@ namespace ClientDemon
                 return thisClient;
             }
         }
-        public static void PostClient()
+        public static Client PostClient() //POST: zaregistrování klienta, získání id_client -> uloží se do registru
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
                 
 
-                var Client = new Client() { id = IPMethods.CreateRegistryId(), name = IPMethods.GetLocalPCName(), mac_address = IPMethods.GetLocalMac(), ip_address = IPMethods.GetLocalIPAddress() };
-
+                var Client = new Client() { name = ComputerInfo.GetLocalPCName(), mac_address = ComputerInfo.GetLocalMac(), ip_address = ComputerInfo.GetLocalIPAddress() };
+                Client thisClient = null;
                 var postTask = client.PostAsJsonAsync<Client>("client", Client);
                 postTask.Wait();
 
@@ -60,64 +61,147 @@ namespace ClientDemon
                     var readTask = result.Content.ReadAsAsync<Client>();
                     readTask.Wait();
 
+
                     Console.WriteLine("Údaje o PC odeslány");
+                    thisClient = readTask.Result;
+                    return thisClient;
                 }
                 else
                 {
                     Console.WriteLine(result.StatusCode);
+                    throw new Exception("Nebyl vrácen token klienta!");
                 }
             }
         }
-        public static Backup[] GetBackupRows()
+
+        public static Backup[] PostGetBackups()
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
 
-                var responseTask = client.GetAsync("backup");
-                responseTask.Wait();
+                var Client = new Client() { id = RegistryUsing.GetRegistryId() };
 
-                var result = responseTask.Result;
+                Backup[] thisBackups = null;
+
+                var postTask = client.PostAsJsonAsync<Client>("GetBackups", Client);
+
+                postTask.Wait();
+
+                var result = postTask.Result;
                 if (result.IsSuccessStatusCode)
                 {
 
                     var readTask = result.Content.ReadAsAsync<Backup[]>();
                     readTask.Wait();
 
-                    var Backups = readTask.Result;
-
-                    return Backups;
+                    thisBackups = readTask.Result;
+                    return thisBackups;
                 }
-                throw new Exception("Tento PC nebyl nalezen");
+                else
+                {
+                    Console.WriteLine(result.StatusCode);
+                    throw new Exception("Backups - no response");
+                }
             }
         }
-        public static Job[] GetJobRows()
+        public static backup_time[] PostGetBackupTimes()
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
 
-                var responseTask = client.GetAsync("job");
-                responseTask.Wait();
+                var Client = new Client() { id = RegistryUsing.GetRegistryId() };
 
-                var result = responseTask.Result;
+                backup_time[] thisBackups = null;
+
+                var postTask = client.PostAsJsonAsync<Client>("GetBackupTimes", Client);
+
+                postTask.Wait();
+
+                var result = postTask.Result;
                 if (result.IsSuccessStatusCode)
                 {
 
-                    var readTask = result.Content.ReadAsAsync<Job[]>();
+                    var readTask = result.Content.ReadAsAsync<backup_time[]>();
                     readTask.Wait();
 
-                    var Jobs = readTask.Result;
-
-                    return Jobs;
+                    thisBackups = readTask.Result;
+                    return thisBackups;
                 }
-                throw new Exception("Tento PC nebyl nalezen");
+                else
+                {
+                    Console.WriteLine(result.StatusCode);
+                    throw new Exception("Backups - no response");
+                }
             }
         }
-        
+        public static backup_target[] PostGetBackupTargets()
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(URL);
+
+                var Client = new Client() { id = RegistryUsing.GetRegistryId() };
+
+                backup_target[] thisBackups = null;
+
+                var postTask = client.PostAsJsonAsync<Client>("GetBackupTargets", Client);
+
+                postTask.Wait();
+
+                var result = postTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+
+                    var readTask = result.Content.ReadAsAsync<backup_target[]>();
+                    readTask.Wait();
+
+                    thisBackups = readTask.Result;
+                    return thisBackups;
+                }
+                else
+                {
+                    Console.WriteLine(result.StatusCode);
+                    throw new Exception("Backups - no response");
+                }
+            }
+        }
+        public static backup_source[] PostGetBackupSources()
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(URL);
+
+                var Client = new Client() { id = RegistryUsing.GetRegistryId() };
+
+                backup_source[] thisBackups = null;
+
+                var postTask = client.PostAsJsonAsync<Client>("GetBackupSources", Client);
+
+                postTask.Wait();
+
+                var result = postTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+
+                    var readTask = result.Content.ReadAsAsync<backup_source[]>();
+                    readTask.Wait();
+
+                    thisBackups = readTask.Result;
+                    return thisBackups;
+                }
+                else
+                {
+                    Console.WriteLine(result.StatusCode);
+                    throw new Exception("Backups - no response");
+                }
+            }
+        }
 
 
         //not using
+        /*
         public static void Put()
         {
             using (var client = new HttpClient())
@@ -166,7 +250,7 @@ namespace ClientDemon
             {
                 client.BaseAddress = new Uri(URL);
 
-                string unique_pc_id = IPMethods.GetRegistryId();
+                string unique_pc_id = RegistryUsing.GetRegistryId();
                 var responseTask = client.GetAsync("client/" + unique_pc_id);
                 responseTask.Wait();
 
@@ -185,6 +269,6 @@ namespace ClientDemon
                     }
                 }
             }
-        }
+        }*/
     }
 }
