@@ -17,7 +17,7 @@ namespace ClientDemon
         public static Application app = new Application();
         static void Main(string[] args)
         {
-            Timer timer = new Timer(Tick, null, 0, 5000);
+            Timer timer = new Timer(Tick, null, 0, 20000);
 
             while (true)
             {
@@ -26,12 +26,10 @@ namespace ClientDemon
                 if (info == ConsoleKey.Escape)
                 {
                     //Environment.Exit(0);
-                    
-                    RegistryUsing.CreateBackups(HttpRequests.PostGetBackups());
-                    RegistryUsing.CreateBackupTimes(HttpRequests.PostGetBackupTimes());
-                    RegistryUsing.CreateBackupTargets(HttpRequests.PostGetBackupTargets());
-                    RegistryUsing.CreateBackupSources(HttpRequests.PostGetBackupSources());
+
                     //RegistryUsing.GetBackups();
+                    BackupFunc bf = new BackupFunc();
+                    bf.DoBackup();
                 }
                 
             }
@@ -39,7 +37,7 @@ namespace ClientDemon
         public static void Tick(object O)
         {
             
-            Console.WriteLine("---" + DateTime.Now + "---");
+            Console.WriteLine("--- " + DateTime.Now + " ---");
             app.Run();
             Console.WriteLine();
 

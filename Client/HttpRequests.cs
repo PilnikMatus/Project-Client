@@ -22,23 +22,22 @@ namespace ClientDemon
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
-                Client thisClient = null;
-
-                string id_client = RegistryUsing.GetRegistryId();
-
-                var responseTask = client.GetAsync("client/" + id_client);
-                responseTask.Wait();
-
-                var result = responseTask.Result;
-                if (result.IsSuccessStatusCode)
+                Client thisClient = RegistryUsing.GetClient();
+                if (thisClient != null)
                 {
+                    var responseTask = client.GetAsync("client/" + thisClient.id);
+                    responseTask.Wait();
 
-                    var readTask = result.Content.ReadAsAsync<Client>();
-                    readTask.Wait();
-                    thisClient = readTask.Result;
-                    return thisClient;
+                    var result = responseTask.Result;
+                    if (result.IsSuccessStatusCode)
+                    {
+                        var readTask = result.Content.ReadAsAsync<Client>();
+                        readTask.Wait();
+
+                        thisClient = readTask.Result;
+                        return thisClient;
+                    }
                 }
-
                 return thisClient;
             }
         }
@@ -80,7 +79,7 @@ namespace ClientDemon
             {
                 client.BaseAddress = new Uri(URL);
 
-                var Client = new Client() { id = RegistryUsing.GetRegistryId() };
+                var Client = RegistryUsing.GetClient();
 
                 Backup[] thisBackups = null;
 
@@ -111,7 +110,7 @@ namespace ClientDemon
             {
                 client.BaseAddress = new Uri(URL);
 
-                var Client = new Client() { id = RegistryUsing.GetRegistryId() };
+                var Client = RegistryUsing.GetClient();
 
                 backup_time[] thisBackups = null;
 
@@ -142,7 +141,7 @@ namespace ClientDemon
             {
                 client.BaseAddress = new Uri(URL);
 
-                var Client = new Client() { id = RegistryUsing.GetRegistryId() };
+                var Client = RegistryUsing.GetClient();
 
                 backup_target[] thisBackups = null;
 
@@ -173,7 +172,7 @@ namespace ClientDemon
             {
                 client.BaseAddress = new Uri(URL);
 
-                var Client = new Client() { id = RegistryUsing.GetRegistryId() };
+                var Client = RegistryUsing.GetClient();
 
                 backup_source[] thisBackups = null;
 

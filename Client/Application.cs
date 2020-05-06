@@ -12,6 +12,7 @@ namespace ClientDemon
     public class Application
     {
         public Client client = new Client();
+        public Backup backup = new Backup();
 
         public void Run()
         {            
@@ -19,20 +20,18 @@ namespace ClientDemon
             {
                 Console.WriteLine("PC bude přidán do databáze");
                 AddThisPC();
-                Thread.Sleep(10000); //počkat na uložení - dělalo problémy
             }
-            else
-                Console.WriteLine("PC je v databázi");
 
 
             if (IsActive())
             {
                 Console.WriteLine($"PC({this.client.name}): AKTIVNÍ");
 
-                Console.WriteLine("Backupy nastavené na tento PC: nezobrazuje se");
+                Console.WriteLine("Stahování backupů...");
+                DownloadBackupDetails();
+                Console.WriteLine("Backupy uloženy");
 
             }
-
             else
                 Console.WriteLine($"PC({this.client.name}): NEAKTIVNÍ");
 
@@ -54,9 +53,9 @@ namespace ClientDemon
         }
         public void AddThisPC()
         {
-            string id_client = HttpRequests.PostClient().id;
+            Client client = HttpRequests.PostClient();
 
-            RegistryUsing.CreateRegistryId(id_client);
+            RegistryUsing.CreateClient(client);
         }
         public bool IsActive()
         {
@@ -64,6 +63,13 @@ namespace ClientDemon
                 return true;
             else
                 return false;
+        }
+        private void DownloadBackupDetails()
+        {
+            RegistryUsing.CreateBackups(HttpRequests.PostGetBackups());
+            RegistryUsing.CreateBackupTimes(HttpRequests.PostGetBackupTimes());
+            RegistryUsing.CreateBackupTargets(HttpRequests.PostGetBackupTargets());
+            RegistryUsing.CreateBackupSources(HttpRequests.PostGetBackupSources());
         }
     }
 }

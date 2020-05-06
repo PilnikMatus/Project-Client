@@ -11,28 +11,31 @@ namespace ClientDemon
 {
     public static class RegistryUsing
     {
-        public static string CreateRegistryId(string id_client)
+        public static void CreateClient(Client client)
         {
             RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Backup-Client"); //pozor - pouze current user?
 
-            key.SetValue("pc_id", id_client);
+            string JSONClient = JsonConvert.SerializeObject(client);
+            key.SetValue("Client", JSONClient);
             key.Close();
-
-            return id_client;
         }
-        public static string GetRegistryId()
+        public static Client GetClient()
         {
             RegistryKey keyread = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Backup-Client"); //pozor - pouze current user?
-            string id_client = "not set";
+            Client client = null;
 
             if (keyread != null)
             {
-                if (keyread.GetValue("pc_id") != null)
-                    id_client = keyread.GetValue("pc_id").ToString();
+                if (keyread.GetValue("Client") != null)
+                {
+                    string JSONBackup = keyread.GetValue("Client").ToString();
+                    client = JsonConvert.DeserializeObject<Client>(JSONBackup);
+                }
                 keyread.Close();
             }
-            return id_client;
+            return client;
         }
+
         public static void CreateBackups(Backup[] backups) //vloží backupy do registru //není omezená délka?
         {
             RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Backup-Client"); //pozor - pouze current user?
@@ -48,13 +51,16 @@ namespace ClientDemon
 
             if (keyread != null)
             {
-                string JSONBackup = keyread.GetValue("Backups").ToString();
+                if (keyread.GetValue("Client") != null)
+                {
+                    string JSONBackup = keyread.GetValue("Backups").ToString();
 
-                Backup[] backups = JsonConvert.DeserializeObject<Backup[]>(JSONBackup);
+                    Backup[] backups = JsonConvert.DeserializeObject<Backup[]>(JSONBackup);
 
-                keyread.Close();
+                    keyread.Close();
 
-                return backups;
+                    return backups;
+                }
             }
 
             throw new Exception("Keyread was null");
@@ -75,13 +81,16 @@ namespace ClientDemon
 
             if (keyread != null)
             {
-                string JSONBackup = keyread.GetValue("BackupTimes").ToString();
+                if (keyread.GetValue("Client") != null)
+                {
+                    string JSONBackup = keyread.GetValue("BackupTimes").ToString();
 
-                backup_time[] backups = JsonConvert.DeserializeObject<backup_time[]>(JSONBackup);
+                    backup_time[] backups = JsonConvert.DeserializeObject<backup_time[]>(JSONBackup);
 
-                keyread.Close();
+                    keyread.Close();
 
-                return backups;
+                    return backups;
+                }
             }
 
             throw new Exception("Keyread was null");
@@ -102,13 +111,16 @@ namespace ClientDemon
 
             if (keyread != null)
             {
-                string JSONBackup = keyread.GetValue("BackupTargets").ToString();
+                if (keyread.GetValue("Client") != null)
+                {
+                    string JSONBackup = keyread.GetValue("BackupTargets").ToString();
 
-                backup_target[] backups = JsonConvert.DeserializeObject<backup_target[]>(JSONBackup);
+                    backup_target[] backups = JsonConvert.DeserializeObject<backup_target[]>(JSONBackup);
 
-                keyread.Close();
+                    keyread.Close();
 
-                return backups;
+                    return backups;
+                }
             }
 
             throw new Exception("Keyread was null");
@@ -129,13 +141,16 @@ namespace ClientDemon
 
             if (keyread != null)
             {
-                string JSONBackup = keyread.GetValue("BackupSources").ToString();
+                if (keyread.GetValue("Client") != null)
+                {
+                    string JSONBackup = keyread.GetValue("BackupSources").ToString();
 
-                backup_source[] backups = JsonConvert.DeserializeObject<backup_source[]>(JSONBackup);
+                    backup_source[] backups = JsonConvert.DeserializeObject<backup_source[]>(JSONBackup);
 
-                keyread.Close();
+                    keyread.Close();
 
-                return backups;
+                    return backups;
+                }
             }
 
             throw new Exception("Keyread was null");
