@@ -11,20 +11,14 @@ namespace ClientDemon
 {
     public class BackupFunc
     {
-        public List<backup_time> times { get; set; }
-        public List<backup_source> sources { get; set; }
-        public List<backup_target> targets { get; set; }
-        
         public void DoBackup()
         {
-            Backup[] backups = RegistryUsing.GetBackups();
+            fullBackupInfo[] backups = FileConfig.GetBackups();
 
-            foreach (Backup sbackup in backups)
+            foreach (fullBackupInfo sbackup in backups)
             {
                 if (sbackup.active) //jeste zkontrolovat jestli je právě čas
                 {
-                    GetBackupDetails(sbackup.id);
-
                     if (sbackup.backup_type == "full_backup")
                         Full_Backup(sbackup);
                     else if (sbackup.backup_type == "diff_backup")
@@ -34,56 +28,29 @@ namespace ClientDemon
                 }
             }
         }
-        private void Full_Backup(Backup backup)
+        private void Full_Backup(fullBackupInfo backup)
         {
-            //source: c:users/Dan/Desktop
-            //target: c:backup
-            //target: c:backup2
-            foreach (backup_source source in sources)
+            foreach (backup_source source in backup.backup_source)
             {
-                foreach (backup_target target in targets)
+                foreach (backup_target target in backup.backup_target)
                 {
-                    Copy(source.path, target.config); //prozatim v config
+                    if (System.IO.Directory.GetDirectories(target.config).Length > 4) //smazat nejstarší
+                    {
+                        FileSystemInfo fileInfo = new DirectoryInfo(target.config).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).First();
+                        Directory.Delete(fileInfo.FullName, true);
+                    }
+
+                    Copy(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm")); //prozatim v config
                 }
             }
 
         }
-        private void Diff_Backup(Backup backup)
+        private void Diff_Backup(fullBackupInfo backup)
         {
 
         }
-        private void Inc_Backup(Backup backup)
+        private void Inc_Backup(fullBackupInfo backup)
         {
-
-        }
-
-        private void GetBackupDetails(int id)
-        {
-            List<backup_source> currentBackupSources = new List<backup_source>();
-            foreach (backup_source source in RegistryUsing.GetBackupSources())
-            {
-                if (source.id_backup == id)
-                    currentBackupSources.Add(source);
-            }
-            this.sources = currentBackupSources;
-
-
-            List<backup_target> currentBackupTargets = new List<backup_target>();
-            foreach (backup_target target in RegistryUsing.GetBackupTargets())
-            {
-                if (target.id_backup == id)
-                    currentBackupTargets.Add(target);
-            }
-            this.targets = currentBackupTargets;
-
-
-            List<backup_time> currentBackupTimes = new List<backup_time>();
-            foreach (backup_time time in RegistryUsing.GetBackupTimes())
-            {
-                if (time.id_backup == id)
-                    currentBackupTimes.Add(time);
-            }
-            this.times = currentBackupTimes;
 
         }
 

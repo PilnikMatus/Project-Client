@@ -31,7 +31,6 @@ namespace ClientDemon
                     BackupFunc bf = new BackupFunc();
                     bf.DoBackup();
                 }
-                
             }
         }
         public static void Tick(object O)
@@ -40,8 +39,6 @@ namespace ClientDemon
             Console.WriteLine("--- " + DateTime.Now + " ---");
             app.Run();
             Console.WriteLine();
-
-
         }
     }
 }

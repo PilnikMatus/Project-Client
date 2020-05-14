@@ -12,7 +12,6 @@ namespace ClientDemon
     public class Application
     {
         public Client client = new Client();
-        public Backup backup = new Backup();
 
         public void Run()
         {            
@@ -55,7 +54,7 @@ namespace ClientDemon
         {
             Client client = HttpRequests.PostClient();
 
-            RegistryUsing.CreateClient(client);
+            FileConfig.CreateClient(client);
         }
         public bool IsActive()
         {
@@ -66,10 +65,7 @@ namespace ClientDemon
         }
         private void DownloadBackupDetails()
         {
-            RegistryUsing.CreateBackups(HttpRequests.PostGetBackups());
-            RegistryUsing.CreateBackupTimes(HttpRequests.PostGetBackupTimes());
-            RegistryUsing.CreateBackupTargets(HttpRequests.PostGetBackupTargets());
-            RegistryUsing.CreateBackupSources(HttpRequests.PostGetBackupSources());
+            FileConfig.CreateBackups(HttpRequests.PostGetBackups());
         }
     }
 }

@@ -22,7 +22,7 @@ namespace ClientDemon
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
-                Client thisClient = RegistryUsing.GetClient();
+                Client thisClient = FileConfig.GetClient();
                 if (thisClient != null)
                 {
                     var responseTask = client.GetAsync("client/" + thisClient.id);
@@ -72,16 +72,15 @@ namespace ClientDemon
                 }
             }
         }
-
-        public static Backup[] PostGetBackups()
+        public static fullBackupInfo[] PostGetBackups()
         {
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
 
-                var Client = RegistryUsing.GetClient();
+                var Client = FileConfig.GetClient();
 
-                Backup[] thisBackups = null;
+                fullBackupInfo[] thisBackups = null;
 
                 var postTask = client.PostAsJsonAsync<Client>("GetBackups", Client);
 
@@ -91,100 +90,7 @@ namespace ClientDemon
                 if (result.IsSuccessStatusCode)
                 {
 
-                    var readTask = result.Content.ReadAsAsync<Backup[]>();
-                    readTask.Wait();
-
-                    thisBackups = readTask.Result;
-                    return thisBackups;
-                }
-                else
-                {
-                    Console.WriteLine(result.StatusCode);
-                    throw new Exception("Backups - no response");
-                }
-            }
-        }
-        public static backup_time[] PostGetBackupTimes()
-        {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(URL);
-
-                var Client = RegistryUsing.GetClient();
-
-                backup_time[] thisBackups = null;
-
-                var postTask = client.PostAsJsonAsync<Client>("GetBackupTimes", Client);
-
-                postTask.Wait();
-
-                var result = postTask.Result;
-                if (result.IsSuccessStatusCode)
-                {
-
-                    var readTask = result.Content.ReadAsAsync<backup_time[]>();
-                    readTask.Wait();
-
-                    thisBackups = readTask.Result;
-                    return thisBackups;
-                }
-                else
-                {
-                    Console.WriteLine(result.StatusCode);
-                    throw new Exception("Backups - no response");
-                }
-            }
-        }
-        public static backup_target[] PostGetBackupTargets()
-        {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(URL);
-
-                var Client = RegistryUsing.GetClient();
-
-                backup_target[] thisBackups = null;
-
-                var postTask = client.PostAsJsonAsync<Client>("GetBackupTargets", Client);
-
-                postTask.Wait();
-
-                var result = postTask.Result;
-                if (result.IsSuccessStatusCode)
-                {
-
-                    var readTask = result.Content.ReadAsAsync<backup_target[]>();
-                    readTask.Wait();
-
-                    thisBackups = readTask.Result;
-                    return thisBackups;
-                }
-                else
-                {
-                    Console.WriteLine(result.StatusCode);
-                    throw new Exception("Backups - no response");
-                }
-            }
-        }
-        public static backup_source[] PostGetBackupSources()
-        {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(URL);
-
-                var Client = RegistryUsing.GetClient();
-
-                backup_source[] thisBackups = null;
-
-                var postTask = client.PostAsJsonAsync<Client>("GetBackupSources", Client);
-
-                postTask.Wait();
-
-                var result = postTask.Result;
-                if (result.IsSuccessStatusCode)
-                {
-
-                    var readTask = result.Content.ReadAsAsync<backup_source[]>();
+                    var readTask = result.Content.ReadAsAsync<fullBackupInfo[]>();
                     readTask.Wait();
 
                     thisBackups = readTask.Result;
