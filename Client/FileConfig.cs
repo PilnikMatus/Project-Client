@@ -14,27 +14,23 @@ namespace ClientDemon
     {
         public static void CreateClient(Client client)
         {
-            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Backup-Client"); //pozor - pouze current user?
-
-            string JSONClient = JsonConvert.SerializeObject(client);
-            key.SetValue("Client", JSONClient);
-            key.Close();
+            using (StreamWriter file = File.CreateText(@"C:\\BackupSW\client.txt"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, client);
+            }
         }
         public static Client GetClient()
         {
-            RegistryKey keyread = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Backup-Client"); //pozor - pouze current user?
-            Client client = null;
-
-            if (keyread != null)
+            if (File.Exists(@"C:\\BackupSW\client.txt"))
             {
-                if (keyread.GetValue("Client") != null)
+                using (StreamReader file = new StreamReader(@"C:\\BackupSW\client.txt"))
                 {
-                    string JSONBackup = keyread.GetValue("Client").ToString();
-                    client = JsonConvert.DeserializeObject<Client>(JSONBackup);
+                    return JsonConvert.DeserializeObject<Client>(file.ReadToEnd());
                 }
-                keyread.Close();
             }
-            return client;
+            else
+                return null;
         }
         public static void CreateBackups(fullBackupInfo[] backups)
         {

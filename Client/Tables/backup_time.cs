@@ -10,7 +10,7 @@ namespace ClientDemon.Tables
     {
         public int id { get; set; }
         public int id_backup { get; set; }
-        public DateTime starttime { get; set; }
+        public DateTime start_time { get; set; }
         public string repetation_unit { get; set; }
         public int repetation_number { get; set; }
     }

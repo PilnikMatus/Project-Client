@@ -63,6 +63,7 @@
     <Compile Include="Tables\Client.cs" />
     <Compile Include="Tables\fullBackupInfo.cs" />
     <Compile Include="Tables\Job.cs" />
+    <Compile Include="Tables\snapshot.cs" />
     <Compile Include="Tables\Token.cs" />
   </ItemGroup>
   <ItemGroup>

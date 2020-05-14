@@ -15,30 +15,34 @@ namespace ClientDemon
     public class Program
     {
         public static Application app = new Application();
+        public static BackupFunc bf = new BackupFunc();
         static void Main(string[] args)
         {
             Timer timer = new Timer(Tick, null, 0, 20000);
+            Timer timer2 = new Timer(BackupChecker, null, 0, 60000);
 
             while (true)
             {
                 ConsoleKey info = Console.ReadKey().Key;
 
-                if (info == ConsoleKey.Escape)
+                if (info == ConsoleKey.F1)
                 {
-                    //Environment.Exit(0);
-
-                    //RegistryUsing.GetBackups();
                     BackupFunc bf = new BackupFunc();
-                    bf.DoBackup();
+                    bf.CheckBackup();
                 }
             }
         }
-        public static void Tick(object O)
+        public static void Tick(object O) //ve finale každou hodinu
         {
-            
             Console.WriteLine("--- " + DateTime.Now + " ---");
             app.Run();
             Console.WriteLine();
+        }
+        public static void BackupChecker(object O) //každou minutu
+        {
+
+            //udělání zálohy
+            Console.WriteLine("sec");
         }
     }
 }
