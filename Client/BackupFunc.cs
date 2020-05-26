@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO.Compression;
 
 namespace ClientDemon
 {
@@ -60,7 +61,7 @@ namespace ClientDemon
                 {
                     foreach (backup_target target in sbackup.backup_target)
                     {
-                        Full_Backup(source, target);
+                        Full_Backup(sbackup, source, target);
                     }
                 }
             }
@@ -86,7 +87,7 @@ namespace ClientDemon
             }
 
         }
-        private void Full_Backup(backup_source source, backup_target target)
+        private void Full_Backup(fullBackupInfo backup, backup_source source, backup_target target)
         {
             target.config += @"\full\";
             if (!Directory.Exists(target.config))
@@ -97,8 +98,10 @@ namespace ClientDemon
                 Directory.Delete(fileInfo.FullName, true);
             }
 
-                    
-            Copy(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm")); //prozatim v config
+            if(backup.format_type == "zip")
+                ZipFile.CreateFromDirectory(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm") + ".zip"); //prozatim v config
+            else
+                Copy(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm") + ".zip"); //prozatim v config
 
             CreateSnapshot(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm"));
         }
