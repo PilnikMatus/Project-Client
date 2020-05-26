@@ -42,7 +42,7 @@ namespace ClientDemon
         {
 
             //udělání zálohy
-            Console.WriteLine("sec");
+            Console.WriteLine("kontrolování záloh... (minuta)");
         }
     }
 }
