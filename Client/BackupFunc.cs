@@ -101,9 +101,7 @@ namespace ClientDemon
             if(backup.format_type == "zip")
                 ZipFile.CreateFromDirectory(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm") + ".zip"); //prozatim v config
             else
-                Copy(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm") + ".zip"); //prozatim v config
-
-            CreateSnapshot(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm"));
+                Copy(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm")); //prozatim v config
         }
 
         private void Diff_Backup(backup_source source, backup_target target)
@@ -135,9 +133,6 @@ namespace ClientDemon
                 target.config += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
                 Directory.CreateDirectory(target.config);
             }
-
-            
-
 
             if (Directory.GetDirectories(target.config).Length == 0) //pokud je první nwbo vic nez 4
             {
@@ -171,6 +166,22 @@ namespace ClientDemon
                     Console.WriteLine(item.path);
                 }
 
+                List<snapshot> deleted = new List<snapshot>();
+                foreach (snapshot item1 in rs)
+                {
+                    pokus = false;
+                    foreach (snapshot item2 in cs)
+                    {
+                        if (item1.path == item2.path &&
+                           item1.type == item2.type &&
+                           item1.change == item2.change)
+                            pokus = true;
+                    }
+                    if (!pokus)
+                        deleted.Add(item1);
+                }
+
+                DeletedSave(target.config, deleted);
                 Copy(source.path, target.config + @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm"), difference); //prozatim v config
             }
         }
@@ -232,10 +243,6 @@ namespace ClientDemon
                     }
                     if (!pokus)
                         difference.Add(item1);
-                }
-                foreach (snapshot item in difference)
-                {
-                    Console.WriteLine(item.path);
                 }
 
                 List<snapshot> deleted = new List<snapshot>();
