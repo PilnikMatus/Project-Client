@@ -54,7 +54,7 @@ namespace ClientDemon
         {
             Client client = HttpRequests.PostClient();
 
-            FileConfig.CreateClient(client);
+            ClientConfig.CreateClient(client);
         }
         public bool IsActive()
         {
@@ -65,7 +65,7 @@ namespace ClientDemon
         }
         private void DownloadBackupDetails()
         {
-            FileConfig.CreateBackups(HttpRequests.PostGetBackups());
+            ClientConfig.CreateBackups(HttpRequests.PostGetBackups());
         }
     }
 }

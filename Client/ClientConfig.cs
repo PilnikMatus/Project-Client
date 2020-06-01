@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace ClientDemon
 {
-    public static class FileConfig
+    public static class ClientConfig
     {
         public static void CreateClient(Client client)
         {
-            using (StreamWriter file = File.CreateText(@"C:\\BackupSW\client.txt"))
+            using (StreamWriter file = System.IO.File.CreateText(@"C:\\BackupSW\client.txt"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, client);
@@ -22,7 +22,7 @@ namespace ClientDemon
         }
         public static Client GetClient()
         {
-            if (File.Exists(@"C:\\BackupSW\client.txt"))
+            if (System.IO.File.Exists(@"C:\\BackupSW\client.txt"))
             {
                 using (StreamReader file = new StreamReader(@"C:\\BackupSW\client.txt"))
                 {
@@ -34,7 +34,7 @@ namespace ClientDemon
         }
         public static void CreateBackups(fullBackupInfo[] backups)
         {
-            using (StreamWriter file = File.CreateText(@"C:\\BackupSW\config.txt"))
+            using (StreamWriter file = System.IO.File.CreateText(@"C:\\BackupSW\config.txt"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, backups);

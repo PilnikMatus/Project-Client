@@ -61,12 +61,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
-    <Compile Include="BackupFunc.cs" />
+    <Compile Include="Backup.cs" />
+    <Compile Include="FileFunc.cs" />
     <Compile Include="HttpRequests.cs" />
     <Compile Include="ComputerInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FileConfig.cs" />
+    <Compile Include="ClientConfig.cs" />
+    <Compile Include="SnapshotFunc.cs" />
     <Compile Include="Tables\backup.cs" />
     <Compile Include="Tables\backup_source.cs" />
     <Compile Include="Tables\backup_target.cs" />

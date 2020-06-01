@@ -22,7 +22,7 @@ namespace ClientDemon
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(URL);
-                Client thisClient = FileConfig.GetClient();
+                Client thisClient = ClientConfig.GetClient();
                 if (thisClient != null)
                 {
                     var responseTask = client.GetAsync("client/" + thisClient.id);
@@ -78,7 +78,7 @@ namespace ClientDemon
             {
                 client.BaseAddress = new Uri(URL);
 
-                var Client = FileConfig.GetClient();
+                var Client = ClientConfig.GetClient();
 
                 fullBackupInfo[] thisBackups = null;
 

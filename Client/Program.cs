@@ -9,15 +9,39 @@ using ClientDemon.Tables;
 using System.Threading;
 using System.Runtime.CompilerServices;
 using Microsoft.Win32;
+using System.Net;
 
 namespace ClientDemon
 {
     public class Program
     {
         public static Application app = new Application();
-        public static BackupFunc bf = new BackupFunc();
+        public static Backup bf = new Backup();
         static void Main(string[] args)
         {
+            /*
+            string host = "ftp://localhost:21";
+            string UserId = "test";
+            string Password = "123456";
+            string path = "/didff";
+            bool IsCreated = true;
+            try
+            {
+                WebRequest request = WebRequest.Create(host + path);
+                request.Method = WebRequestMethods.Ftp.MakeDirectory;
+                request.Credentials = new NetworkCredential(UserId, Password);
+                using (var resp = (FtpWebResponse)request.GetResponse())
+                {
+                    Console.WriteLine(resp.StatusCode);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            Console.ReadLine();
+            */
+            
             Timer timer = new Timer(Tick, null, 0, 20000);
             Timer timer2 = new Timer(BackupChecker, null, 0, 60000);
 
@@ -27,10 +51,11 @@ namespace ClientDemon
 
                 if (info == ConsoleKey.F1)
                 {
-                    BackupFunc bf = new BackupFunc();
+                    Backup bf = new Backup();
                     bf.CheckBackup();
                 }
             }
+            
         }
         public static void Tick(object O) //ve finale každou hodinu
         {
