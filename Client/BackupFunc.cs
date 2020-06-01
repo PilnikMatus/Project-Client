@@ -3,13 +3,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO.Compression;
+using System.Linq;
 
 namespace ClientDemon
 {
@@ -21,14 +16,14 @@ namespace ClientDemon
 
             foreach (fullBackupInfo sbackup in backups)
             {
-                if (sbackup.active) //jeste zkontrolovat jestli je právě čas
+                if (sbackup.active)
                 {
-                    //if (sbackup.last_possible_backup_date > DateTime.Now && isTime(sbackup.backup_time)) //zjištění jestli mám teď dělat zálohu
+                    //if (sbackup.last_possible_backup_date > DateTime.Now && isTime(sbackup.backup_time)) //zjištění času
                         DoBackup(sbackup);
                 }
             }
         }
-        private bool isTime(List<backup_time> times) //zjistnei času u tohoto jednoho backup
+        private bool isTime(List<backup_time> times)
         {
             int repetation;
             foreach (backup_time item in times)
@@ -55,179 +50,72 @@ namespace ClientDemon
         }
         private void DoBackup(fullBackupInfo sbackup)
         {
-            if (sbackup.backup_type == "full_backup")
+            foreach (backup_source source in sbackup.backup_source)
             {
-                foreach (backup_source source in sbackup.backup_source)
+                foreach (backup_target target in sbackup.backup_target)
                 {
-                    foreach (backup_target target in sbackup.backup_target)
-                    {
-                        Full_Backup(sbackup, source, target);
-                    }
+                    if (sbackup.backup_type == "full_backup")
+                        Full_Backup(sbackup.format_type, source, target);
+                    if (sbackup.backup_type == "diff_backup")
+                        Diff_Backup(sbackup.format_type, source, target);
+                    if (sbackup.backup_type == "inc_backup")
+                        Inc_Backup(sbackup.format_type, source, target);
                 }
             }
-            else if (sbackup.backup_type == "diff_backup")
-            {
-                foreach (backup_source source in sbackup.backup_source)
-                {
-                    foreach (backup_target target in sbackup.backup_target)
-                    {
-                        Diff_Backup(source, target);
-                    }
-                }
-            }
-            else if (sbackup.backup_type == "inc_backup")
-            {
-                foreach (backup_source source in sbackup.backup_source)
-                {
-                    foreach (backup_target target in sbackup.backup_target)
-                    {
-                        Inc_Backup(source, target);
-                    }
-                }
-            }
-
         }
-        private void Full_Backup(fullBackupInfo backup, backup_source source, backup_target target)
+        private void Full_Backup(string format_type, backup_source source, backup_target target)
         {
-            target.config += @"\full\";
-            if (!Directory.Exists(target.config))
-                Directory.CreateDirectory(target.config);
-            if (Directory.GetDirectories(target.config).Length > 4) //smazat nejstarší - max 5
-            {
-                FileSystemInfo fileInfo = new DirectoryInfo(target.config).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).First();
-                Directory.Delete(fileInfo.FullName, true);
-            }
+            string targetPath = target.path;
+            targetPath += @"\full\";
+            CheckParentDirectories(targetPath);
 
-            if(backup.format_type == "zip")
-                ZipFile.CreateFromDirectory(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm") + ".zip"); //prozatim v config
+
+
+            if (format_type == "zip")
+                ZipFile.CreateFromDirectory(source.path, targetPath + DateTime.Now.ToString("yyyy/MM/dd H.mm") + ".zip"); //prozatim v config
             else
-                Copy(source.path, target.config + DateTime.Now.ToString("yyyy/MM/dd H.mm")); //prozatim v config
+                Copy(source.path, targetPath + DateTime.Now.ToString("yyyy/MM/dd H.mm")); //prozatim v config
         }
 
-        private void Diff_Backup(backup_source source, backup_target target)
+        private void Diff_Backup(string format_type, backup_source source, backup_target target)
         {
-            target.config += @"\diff\";
-            string targetp = target.config;
-            if (!Directory.Exists(target.config))
-                Directory.CreateDirectory(target.config);
+            string targetPath = target.path;
+            targetPath += @"\diff\";
+            string targetp = targetPath;
+            CheckParentDirectories(targetPath);
 
-            if (Directory.GetDirectories(target.config).Length > 4) //smazat nejstarší - max 5
+            if (Directory.GetDirectories(targetPath).Length > 0)
             {
-                FileSystemInfo fileInfo = new DirectoryInfo(target.config).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).First();
-                Directory.Delete(fileInfo.FullName, true);
-            } 
-
-            if (Directory.GetDirectories(target.config).Length > 0)
-            {
-                FileSystemInfo fileInfo2 = new DirectoryInfo(target.config).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).Last();
+                FileSystemInfo fileInfo2 = new DirectoryInfo(targetPath).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).Last();
                 if (Directory.GetDirectories(fileInfo2.FullName).Length < 5)
-                    target.config = fileInfo2.FullName;
+                    targetPath = fileInfo2.FullName;
                 else
                 {
-                    target.config += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
-                    Directory.CreateDirectory(target.config);
+                    targetPath += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
+                    Directory.CreateDirectory(targetPath);
                 }
             } 
-            else if (Directory.GetDirectories(target.config).Length == 0)
+            else if (Directory.GetDirectories(targetPath).Length == 0)
             {
-                target.config += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
-                Directory.CreateDirectory(target.config);
+                targetPath += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
+                Directory.CreateDirectory(targetPath);
             }
-
-            if (Directory.GetDirectories(target.config).Length == 0) //pokud je první nwbo vic nez 4
+            
+            if (Directory.GetDirectories(targetPath).Length == 0 && Directory.GetFiles(targetPath).Length == 0)
             {
-                CreateSnapshot(source.path, target.config);
+                SaveSnapshot(source.path, targetPath);
 
-                target.config += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
-                Copy(source.path, target.config); //prozatim v config
-            } 
-            else
-            {
-                List<snapshot> rs = ReadPreviousSnapshot(target.config);
-                List<snapshot> cs = CreateSnapshot2(source.path);
+                targetPath += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
 
-                bool pokus = false;
-                List<snapshot> difference = new List<snapshot>();
-                foreach (snapshot item1 in cs)
-                {
-                    pokus = false;
-                    foreach (snapshot item2 in rs)
-                    {
-                        if (item1.path == item2.path &&
-                           item1.type == item2.type &&
-                           item1.change == item2.change)
-                            pokus = true;
-                    }
-                    if (!pokus)
-                        difference.Add(item1);
-                }
-                foreach (snapshot item in difference)
-                {
-                    Console.WriteLine(item.path);
-                }
-
-                List<snapshot> deleted = new List<snapshot>();
-                foreach (snapshot item1 in rs)
-                {
-                    pokus = false;
-                    foreach (snapshot item2 in cs)
-                    {
-                        if (item1.path == item2.path &&
-                           item1.type == item2.type &&
-                           item1.change == item2.change)
-                            pokus = true;
-                    }
-                    if (!pokus)
-                        deleted.Add(item1);
-                }
-
-                DeletedSave(target.config, deleted);
-                Copy(source.path, target.config + @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm"), difference); //prozatim v config
-            }
-        }
-        private void Inc_Backup(backup_source source, backup_target target)
-        {
-            target.config += @"\inc\";
-            string targetp = target.config;
-            if (!Directory.Exists(target.config))
-                Directory.CreateDirectory(target.config);
-
-            if (Directory.GetDirectories(target.config).Length > 4) //smazat nejstarší - max 5
-            {
-                FileSystemInfo fileInfo = new DirectoryInfo(target.config).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).First();
-                Directory.Delete(fileInfo.FullName, true);
-            }
-
-            if (Directory.GetDirectories(target.config).Length > 0)
-            {
-                FileSystemInfo fileInfo2 = new DirectoryInfo(target.config).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).Last();
-                if (Directory.GetDirectories(fileInfo2.FullName).Length < 5)
-                    target.config = fileInfo2.FullName;
+                if (format_type == "zip")
+                    ZipFile.CreateFromDirectory(source.path, targetPath + ".zip"); //prozatim v config
                 else
-                {
-                    target.config += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
-                    Directory.CreateDirectory(target.config);
-                }
-            }
-            else if (Directory.GetDirectories(target.config).Length == 0)
-            {
-                target.config += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
-                Directory.CreateDirectory(target.config);
-            }
-
-            if (Directory.GetDirectories(target.config).Length == 0) //pokud je první
-            {
-                CreateSnapshot(source.path, target.config);
-
-                target.config += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
-                Copy(source.path, target.config); //prozatim v config
-            }
+                    Copy(source.path, targetPath); //prozatim v config
+            } 
             else
             {
-                List<snapshot> rs = ReadPreviousSnapshot(target.config);
-                List<snapshot> cs = CreateSnapshot2(source.path);
-
-                CreateSnapshot(source.path, target.config);
+                List<snapshot> rs = ReadPreviousSnapshot(targetPath);
+                List<snapshot> cs = GetSnapshotList(source.path);
 
                 bool pokus = false;
                 List<snapshot> difference = new List<snapshot>();
@@ -260,11 +148,109 @@ namespace ClientDemon
                         deleted.Add(item1);
                 }
 
-                DeletedSave(target.config, deleted);
-                Copy(source.path, target.config + @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm"), difference); //prozatim v config
+                DeletedSave(targetPath, deleted);
+
+                if (format_type == "zip")
+                    ZipFile.CreateFromDirectory(source.path, targetPath + @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm") + ".zip"); //prozatim v config
+                else
+                    Copy(source.path, targetPath + @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm"), difference); //prozatim v config
+
             }
         }
+        private void Inc_Backup(string format_type, backup_source source, backup_target target)
+        {
+            string targetPath = target.path;
+            targetPath += @"\inc\";
+            string targetp = targetPath;
+            if (!Directory.Exists(targetPath))
+                Directory.CreateDirectory(targetPath);
 
+            if (Directory.GetDirectories(targetPath).Length > 4) //smazat nejstarší - max 5
+            {
+                FileSystemInfo fileInfo = new DirectoryInfo(targetPath).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).First();
+                Directory.Delete(fileInfo.FullName, true);
+            }
+
+            if (Directory.GetDirectories(targetPath).Length > 0)
+            {
+                FileSystemInfo fileInfo2 = new DirectoryInfo(targetPath).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).Last();
+                if (Directory.GetDirectories(fileInfo2.FullName).Length < 5)
+                    targetPath = fileInfo2.FullName;
+                else
+                {
+                    targetPath += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
+                    Directory.CreateDirectory(targetPath);
+                }
+            }
+            else if (Directory.GetDirectories(targetPath).Length == 0)
+            {
+                targetPath += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
+                Directory.CreateDirectory(targetPath);
+            }
+
+            if (Directory.GetDirectories(targetPath).Length == 0) //pokud je první
+            {
+                SaveSnapshot(source.path, targetPath);
+
+                targetPath += @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm");
+                Copy(source.path, targetPath); //prozatim v config
+            }
+            else
+            {
+                List<snapshot> rs = ReadPreviousSnapshot(targetPath);
+                List<snapshot> cs = GetSnapshotList(source.path);
+
+                SaveSnapshot(source.path, targetPath);
+
+                bool pokus = false;
+                List<snapshot> difference = new List<snapshot>();
+                foreach (snapshot item1 in cs)
+                {
+                    pokus = false;
+                    foreach (snapshot item2 in rs)
+                    {
+                        if (item1.path == item2.path &&
+                           item1.type == item2.type &&
+                           item1.change == item2.change)
+                            pokus = true;
+                    }
+                    if (!pokus)
+                        difference.Add(item1);
+                }
+
+                List<snapshot> deleted = new List<snapshot>();
+                foreach (snapshot item1 in rs)
+                {
+                    pokus = false;
+                    foreach (snapshot item2 in cs)
+                    {
+                        if (item1.path == item2.path &&
+                           item1.type == item2.type &&
+                           item1.change == item2.change)
+                            pokus = true;
+                    }
+                    if (!pokus)
+                        deleted.Add(item1);
+                }
+
+                DeletedSave(targetPath, deleted);
+
+                if (format_type == "zip")
+                    ZipFile.CreateFromDirectory(source.path, targetPath + @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm") + ".zip"); //prozatim v config
+                else
+                    Copy(source.path, targetPath + @"\" + DateTime.Now.ToString("yyyy/MM/dd H.mm"), difference); //prozatim v config
+            }
+        }
+        private void CheckParentDirectories(string target)
+        {
+            if (!Directory.Exists(target))
+                Directory.CreateDirectory(target);
+            if (Directory.GetDirectories(target).Length > 4) //smazat nejstarší - max 5
+            {
+                FileSystemInfo fileInfo = new DirectoryInfo(target).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).First();
+                Directory.Delete(fileInfo.FullName, true);
+            }
+        }
         public void Copy(string source, string target, List<snapshot> previousSnapshot = null)
          {
 
@@ -274,7 +260,7 @@ namespace ClientDemon
             CopyDirectories(Source, Target, previousSnapshot);
              
          }
-         public void CopyDirectories(DirectoryInfo source, DirectoryInfo target, List<snapshot> previousSnapshot = null)
+        public void CopyDirectories(DirectoryInfo source, DirectoryInfo target, List<snapshot> previousSnapshot = null)
         {
             Directory.CreateDirectory(target.FullName);
 
@@ -320,7 +306,7 @@ namespace ClientDemon
             string filepath = target + @"\deleted.txt";
 
             if(File.Exists(filepath))
-            deleted.AddRange(ReadDeleted(filepath));
+                deleted.AddRange(ReadDeleted(filepath));
 
             using (StreamWriter file = File.CreateText(filepath))
             {
@@ -338,14 +324,13 @@ namespace ClientDemon
             }
 
         }
-        private void CreateSnapshot(string ssource, string ttarget)
+        private void SaveSnapshot(string ssource, string ttarget)
         {
             DirectoryInfo target = new DirectoryInfo(ttarget);
 
             string filepath = target + @"\snapshot.txt";
-            List<snapshot> snapshots = new List<snapshot>();
 
-            snapshots = CreateSnapshot2(ssource);
+            List<snapshot> snapshots = GetSnapshotList(ssource);
 
             using (StreamWriter file = File.CreateText(filepath))
             {
@@ -353,7 +338,7 @@ namespace ClientDemon
                 serializer.Serialize(file, snapshots);
             }
         }
-        private List<snapshot> CreateSnapshot2(string ssource)
+        private List<snapshot> GetSnapshotList(string ssource)
         {
             DirectoryInfo source = new DirectoryInfo(ssource);
 
@@ -378,7 +363,7 @@ namespace ClientDemon
 
                 snapshots.Add(s);
 
-                snapshots.AddRange(CreateSnapshot2(SourceSubDir.FullName));
+                snapshots.AddRange(GetSnapshotList(SourceSubDir.FullName));
             }
             return snapshots;
         }
@@ -389,7 +374,6 @@ namespace ClientDemon
             using (StreamReader file = new StreamReader(target + @"\snapshot.txt"))
             {
                 List<snapshot> snapshots = JsonConvert.DeserializeObject<snapshot[]>(file.ReadToEnd()).ToList();
-                Console.WriteLine(snapshots.Count);
                 return snapshots;
             }
         }
