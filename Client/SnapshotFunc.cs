@@ -114,21 +114,21 @@ namespace ClientDemon
         }
         public List<snapshot> GetSnapshotDifference(List<snapshot> rs, List<snapshot> cs)
         {
-            bool pokus;
+            bool same;
 
             List<snapshot> difference = new List<snapshot>();
 
             foreach (snapshot item1 in cs)
             {
-                pokus = false;
+                same = false;
                 foreach (snapshot item2 in rs)
                 {
                     if (item1.path == item2.path &&
                        item1.type == item2.type &&
                        item1.change == item2.change)
-                        pokus = true;
+                        same = true;
                 }
-                if (!pokus)
+                if (!same)
                     difference.Add(item1);
             }
 

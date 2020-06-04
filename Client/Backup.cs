@@ -57,20 +57,20 @@ namespace ClientDemon
                 foreach (backup_target target in sbackup.backup_target)
                 {
                     if (sbackup.backup_type == "full_backup")
-                        Full_Backup(sbackup.format_type, source, target);
+                        Full_Backup(sbackup, source, target);
                     if (sbackup.backup_type == "diff_backup")
-                        Diff_Backup(sbackup.format_type, source, target);
+                        Diff_Backup(sbackup, source, target);
                     if (sbackup.backup_type == "inc_backup")
-                        Inc_Backup(sbackup.format_type, source, target);
+                        Inc_Backup(sbackup, source, target);
                 }
             }
         }
-        private void Full_Backup(string format_type, backup_source source, backup_target target)
+        private void Full_Backup(fullBackupInfo backup, backup_source source, backup_target target)
         {
             string targetPath = target.path;
             targetPath += @"\full\";
 
-            bool ZIP = format_type == "zip";
+            bool ZIP = backup.format_type == "zip";
 
             fileFunc.CheckParentDirectory(targetPath, ZIP);
 
@@ -80,14 +80,16 @@ namespace ClientDemon
                 fileFunc.Copy(source.path, targetPath + AddDate());
 
             fileFunc.DeleteOldBackups(target.path + @"\full\", ZIP);
+
+            HttpRequests.PostJobHistory(backup.id, DateTime.Now, true);
         }
 
-        private void Diff_Backup(string format_type, backup_source source, backup_target target)
+        private void Diff_Backup(fullBackupInfo backup, backup_source source, backup_target target)
         {
             string targetPath = target.path;
             targetPath += @"\diff\";
 
-            bool ZIP = format_type == "zip";
+            bool ZIP = backup.format_type == "zip";
 
             targetPath = fileFunc.CheckDirectoriesGetRealName(targetPath, ZIP);
 
@@ -123,14 +125,16 @@ namespace ClientDemon
             }
 
             fileFunc.DeleteOldBackups(target.path + @"\diff\", ZIP);
+
+
         }
 
-        private void Inc_Backup(string format_type, backup_source source, backup_target target)
+        private void Inc_Backup(fullBackupInfo backup, backup_source source, backup_target target)
         {
             string targetPath = target.path;
             targetPath += @"\inc\";
 
-            bool ZIP = format_type == "zip";
+            bool ZIP = backup.format_type == "zip";
 
             targetPath = fileFunc.CheckDirectoriesGetRealName(targetPath, ZIP);
 

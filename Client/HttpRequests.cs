@@ -103,7 +103,27 @@ namespace ClientDemon
                 }
             }
         }
+        public static void PostJobHistory(int id_backup, DateTime date, bool success)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(URL);
 
+                var Client = new job_history() { id_job = id_backup, date = date, success = success, error_message = "", info = "" };
+
+                var postTask = client.PostAsJsonAsync("job_history", Client);
+                postTask.Wait();
+
+                var result = postTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    var readTask = result.Content.ReadAsAsync<job_history>();
+                    readTask.Wait();
+
+                    Console.WriteLine("Job_History sent");
+                }
+            }
+        }
 
         //not using
         /*

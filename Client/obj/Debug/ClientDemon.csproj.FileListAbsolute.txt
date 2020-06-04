@@ -10,3 +10,8 @@ C:\Users\Dan\Documents\GitHub\Project-Client\Client\bin\Debug\ClientDemon.pdb
 C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\ClientDemon.csprojAssemblyReference.cache
 C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\ClientDemon.exe
 C:\Users\Dan\Documents\GitHub\Project-Client\Client\obj\Debug\ClientDemon.pdb
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\bin\Debug\Antlr3.Runtime.dll
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\bin\Debug\ExpressionEvaluator.dll
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\bin\Debug\GSF.Core.dll
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\bin\Debug\Antlr3.Runtime.pdb
+C:\Users\Dan\Documents\GitHub\Project-Client\Client\bin\Debug\GSF.Core.xml
